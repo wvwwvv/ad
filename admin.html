@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>99 Studio - Portfolio Admin Preview</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0b0b0b;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .phone-frame {
+            width: 100%;
+            max-width: 414px;
+            background: #0b0b0b;
+            border-radius: 30px;
+            padding: 15px;
+            border: 1px solid #222;
+        }
+        /* زر الأدمن العلوي */
+        .admin-trigger-btn {
+            background: #1f1f1f;
+            color: #fff;
+            border: 1px dashed #555;
+            padding: 12px;
+            width: 100%;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .admin-trigger-btn:hover {
+            background: #2a2a2a;
+        }
+
+        /* تنسيق الأقسام مستوحى من صورتك */
+        .section-box {
+            background: #141414;
+            border: 1px solid #222;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        
+        /* شبكة عرض البراندات */
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .brand-card {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 16px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .brand-card:active {
+            transform: scale(0.97);
+        }
+        .brand-card img {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 8px;
+            border: 1px solid #333;
+        }
+        .brand-card h3 {
+            font-size: 0.8rem;
+            color: #ddd;
+            font-weight: 500;
+        }
+
+        /* نافذة الإضافة (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: flex-end; /* تفتح من الأسفل لتناسب الجوال */
+            z-index: 100;
+        }
+        .modal-content {
+            background: #161616;
+            padding: 25px 20px;
+            border-radius: 24px 24px 0 0;
+            width: 100%;
+            max-width: 450px;
+            border-top: 1px solid #333;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-content h2 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 12px;
+            text-align: right;
+        }
+        .form-group label {
+            font-size: 0.75rem;
+            color: #aaa;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .modal-content input[type="text"], 
+        .modal-content input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+        .save-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        .close-btn {
+            background: transparent;
+            color: #888;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* عرض معرض صور البراند المختار */
+        #galleryView {
+            display: none;
+        }
+        .back-link {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .gallery-grid img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #222;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #555;
+            margin-top: 20px;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+    <!-- الرئيسية: عرض البورتفوليو والبراندات -->
+    <div id="homeView">
+        <!-- زر لوحة التحكم الخاص بالمصمم (يظهر له من جواله) -->
+        <button class="admin-trigger-btn" onclick="openAdminModal()">
+            <span>➕</span> إضافة براند جديد (لوحة الأدمن)
+        </button>
+
+        <div class="section-box">
+            <div class="section-title">PORTFOLIO / SELECTED WORK</div>
+            <div class="brands-grid" id="brandsContainer">
+                <!-- البراندات تضاف هنا ديناميكياً -->
+            </div>
+        </div>
+
+        <div class="footer">
+            C 2026 99 STUDIO
+        </div>
+    </div>
+
+    <!-- شاشة عرض تفاصيل البراند وصوره -->
+    <div id="galleryView">
+        <button class="back-link" onclick="backToHome()">← العودة للرئيسية</button>
+        <div class="section-box">
+            <div class="section-title" id="activeBrandTitle">BRAND NAME</div>
+            <div class="gallery-grid" id="galleryImagesContainer">
+                <!-- صور الباكيجنج الخاصة بالبراند تظهر هنا -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- نافذة الأدمن المنبثقة لإضافة البيانات -->
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <h2>إدارة المحتوى (من الجوال)</h2>
+        
+        <div class="form-group">
+            <label>اسم البراند:</label>
+            <input type="text" id="brandNameInput" placeholder="مثال: Brand Identity">
+        </div>
+
+        <div class="form-group">
+            <label>أيقونة البراند (اللوجو):</label>
+            <input type="file" id="brandIconInput" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label>صور الباكيجنج والأعمال (اختر صورة أو أكثر):</label>
+            <input type="file" id="brandImagesInput" accept="image/*" multiple>
+        </div>
+
+        <button class="save-btn" onclick="addNewBrand()">حفظ ونشر فوري</button>
+        <button class="close-btn" onclick="closeAdminModal()">إلغاء</button>
+    </div>
+</div>
+
+<script>
+    // بيانات أولية افتراضية مطابقة لستايل صورتك
+    let brandsList = [
+        {
+            name: "BRAND IDENTITY",
+            icon: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150",
+            images: [
+                "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300",
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300"
+            ]
+        },
+        {
+            name: "PACKAGING",
+            icon: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=150",
+            images: [
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300"
+            ]
+        }
+    ];
+
+    function renderBrands() {
+        const container = document.getElementById('brandsContainer');
+        container.innerHTML = '';
+        brandsList.forEach((brand, index) => {
+            container.innerHTML += `
+                <div class="brand-card" onclick="viewBrandDetails(${index})">
+                    <img src="${brand.icon}" alt="${brand.name}">
+                    <h3>${brand.name}</h3>
+                </div>
+            `;
+        });
+    }
+
+    function openAdminModal() {
+        document.getElementById('adminModal').style.display = 'flex';
+    }
+
+    function closeAdminModal() {
+        document.getElementById('adminModal').style.display = 'none';
+    }
+
+    function addNewBrand() {
+        const name = document.getElementById('brandNameInput').value;
+        const iconFile = document.getElementById('brandIconInput').files[0];
+        const imagesFiles = document.getElementById('brandImagesInput').files;
+
+        if (!name || !iconFile) {
+            alert('الرجاء إدخال اسم البراند واختيار الأيقونة.');
+            return;
+        }
+
+        // إنشاء روابط مؤقتة للملفات المرفوعة من الموبايل لتعرض فوراً
+        const iconUrl = URL.createObjectURL(iconFile);
+        let imagesUrls = [];
+        for (let i = 0; i < imagesFiles.length; i++) {
+            imagesUrls.push(URL.createObjectURL(imagesFiles[i]));
+        }
+
+        // إضافة البراند الجديد للقائمة
+        brandsList.push({
+            name: name,
+            icon: iconUrl,
+            images: imagesUrls.length > 0 ? imagesUrls : [iconUrl]
+        });
+
+        renderBrands();
+        closeAdminModal();
+
+        // تفريغ الحقول
+        document.getElementById('brandNameInput').value = '';
+        document.getElementById('brandIconInput').value = '';
+        document.getElementById('brandImagesInput').value = '';
+    }
+
+    function viewBrandDetails(index) {
+        const brand = brandsList[index];
+        document.getElementById('homeView').style.display = 'none';
+        document.getElementById('galleryView').style.display = 'block';
+        document.getElementById('activeBrandTitle').innerText = brand.name;
+
+        const grid = document.getElementById('galleryImagesContainer');
+        grid.innerHTML = '';
+        brand.images.forEach(img => {
+            grid.innerHTML += `<img src="${img}" alt="Work">`;
+        });
+    }
+
+    function backToHome() {
+        document.getElementById('galleryView').style.display = 'none';
+        document.getElementById('homeView').style.display = 'block';
+    }
+
+    // التشغيل الأولي
+    renderBrands();
+</script>
+
+</body>
+</html>
